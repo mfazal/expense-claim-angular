@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Randstad Expense Claims - Built with AngularJS</title>
+  <meta charset='utf-8'>
+  <meta name="description" content="Expense Claim form for Consultants in Randstad">
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/angular.moment/0.10.3/angular-moment.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-animate.js"></script>
+    <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.13.4.js"></script>
+
+  <script type="text/javascript" src="js/main.js"></script>
+</head>
+<body ng-app="expenseclaiming" ng-controller="ExpenseClaimCtrl" >
+<style>
+  .full button span {
+    background-color: limegreen;
+    border-radius: 32px;
+    color: black;
+  }
+  .partially button span {
+    background-color: orange;
+    border-radius: 32px;
+    color: black;
+  }
+</style>
+  <div class="container" width="1200px" id="expenseClaim" >
+    <div class="row">
+      <div class="col-xs-12 heading">
+        EXPENSE CLAIMS MALAYSIA
+      </div>
+    </div>
+    <div class="row branding">
+      <div class="col-xs-6">
+        <div class="expense-claim-number-container">
+          <label for="expense-claim-number">Expense Claim #</label><input type="text" id="expense-claim-number" ng-model="expenseClaim.expense_claim_number" />
+        </div>
+      </div>
+      <div class="col-xs-6 logo-container">
+        <input type="file" id="imgInp" />
+        <img ng-hide="logoRemoved" id="company_logo" ng-src="{{ logo }}" alt="your image" width="300" />
+        <div>
+          <div class="noPrint" ng-hide="printMode">
+            <a ng-click="editLogo()" href >Edit Logo</a>
+            <a ng-click="toggleLogo()" id="remove_logo" href >{{ logoRemoved ? 'Show' : 'Hide' }} logo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row infos">
+      <div class="col-xs-6">
+        <div class="input-container"><input type="text" ng-model="expenseClaim.employee_info.name"/></div>
+        <div class="input-container"><input type="text" ng-model="expenseClaim.employee_info.branch_code"/></div>
+        <p class="input-group">
+              <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="expenseClaim.employee_info.claim_date" is-open="status.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+              </span>
+
+        </p>
+        <div class="input-container" data-ng-hide='printMode'>
+          <select ng-model='currencySymbol' ng-options='currency.symbol as currency.name for currency in availableCurrencies'></select>
+        </div>
+      </div>
+      <div class="col-xs-6 right">
+        <div class="input-container"><input type="text" ng-model="expenseClaim.bank_info.bank_code"/></div>
+        <div class="input-container"><input type="text" ng-model="expenseClaim.bank_info.acct_num"/></div>
+        <div class="input-container"><input type="text" ng-model="expenseClaim.bank_info.acct_name"/></div>
+      </div>
+    </div>
+    <div class="items-table">
+      <div class="row header">
+        <div class="col-xs-1">&nbsp;</div>
+        <div class="col-xs-1">DOT</div>
+        <div class="col-xs-1">Cost Center</div>
+        <div class="col-xs-1">GLCode</div>
+        <div class="col-xs-2">Description</div>
+        <div class="col-xs-1">Currency</div>
+        <div class="col-xs-1">Amount {{currencySymbol}}</div>
+        <div class="col-xs-1">GST</div>
+        <div class="col-xs-1">Exch Rate</div>
+        <div class="col-xs-2 text-right">Total</div>
+      </div>
+      <div class="row expense-item" ng-repeat="claim in expenseClaim.claims" ng-animate="'slide-down'">
+        <div class="col-xs-1 remove-item-container">
+          <a href ng-hide="printMode" ng-click="removeClaim(claim)" class="btn btn-danger">[X]</a>
+        </div>
+        <div class="col-xs-1 input-container">
+          <input ng-model="claim.trx_date" placeholder="Transaction Date" />
+        </div>
+        <div class="col-xs-1 input-container">
+          <input ng-model="claim.cost_center" placeholder="Cost Center" />
+        </div>        
+        <div class="col-xs-1 input-container">
+          <select ng-model='claim.gl_code' ng-options='glcode.code as glcode.desc for glcode in availbleGLCodes'></select>          
+        </div>                
+        <div class="col-xs-2 input-container">
+          <input ng-model="claim.description" placeholder="Description" />
+        </div>                        
+        <div class="col-xs-1 input-container">
+          <select ng-model='claim.currency' ng-options='currency.symbol as currency.name for currency in availableCurrencies'></select>
+        </div>                                        
+        <div class="col-xs-1 input-container">
+          <input ng-model="claim.amt" value="0.00" ng-required ng-validate="number" size="6" placeholder="Amount" />
+        </div>        
+        <div class="col-xs-1 input-container">
+          <input ng-model="claim.gst" value="0.00" ng-required ng-validate="number" size="6" placeholder="GST" />
+        </div>                
+        <div class="col-xs-1 input-container">
+          <input ng-model="claim.exch_rate" value="0.00" ng-required ng-validate="number" size="6" placeholder="Exchange Rate" />
+        </div>                        
+        <div class="col-xs-2 text-right input-container">
+          {{claim.amt * claim.exch_rate | currency: claim.currency}}
+        </div>
+      </div>
+      <div class="row expense-item">
+        <div class="col-xs-12 add-item-container">
+          <a class="btn btn-primary" href ng-click="addClaim()" >[+]</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-10 text-right">Sub Total</div>
+        <div class="col-xs-2 text-right">{{expenseClaimSubTotal() | currency: currencySymbol}}</div>
+      </div>
+      <div class="row">
+        <div class="col-xs-10 text-right">Grand Total:</div>
+        <div class="col-xs-2 text-right">{{calculateGrandTotal() | currency: currencySymbol}}</div>
+      </div>
+    </div>
+    <div class="row noPrint actions">
+      <a href="#" class="btn btn-primary" ng-show="printMode" ng-click="printInfo()">Print</a>
+      <a href="#" class="btn btn-primary" ng-click="clearLocalStorage()">Reset</a>
+      <a href="#" class="btn btn-primary" ng-hide="printMode" ng-click="printMode = true;">Turn On Print Mode</a>
+      <a href="#" class="btn btn-primary" ng-show="printMode" ng-click="printMode = false;">Turn Off Print Mode</a>
+      <a href="#" class="btn btn-success" ng-show="printMode" ng-click="save()"><span class="glyphicon glyphicon-send" aria-hidden="true"></span></a>
+    </div>
+  </div>
+
+  <div ng-hide="printMode" class="copy noPrint">
+    Powered By AngularJS
+  </div>
+</body>
+</html>
