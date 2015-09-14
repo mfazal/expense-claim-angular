@@ -1,7 +1,8 @@
-angular.module('expenseclaiming', ['angularMoment','ui.bootstrap'])
+angular.module('expenseclaiming', ['angularMoment','ui.bootstrap','firebase'])
 
 // The default logo for the expense claim
 .constant('DEFAULT_LOGO', 'images/randstad_logo.png')
+.constant('FIREBASE_URL', 'https://expenseify.firebaseio.com/')
 
 
 // The expense claim displayed when the user first uses the app
@@ -19,7 +20,7 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap'])
     acct_name: 'JOHN DOE JR.'
   },  
   claims:[
-    { trx_date: '01/08/2015', cost_center: 'MMS CyberJaya', gl_code: '4165', description: '1-day Training course', currency:'USD', amt: 299, gst: 2,  exch_rate: 4.31 }
+    { trx_date: '01/08/2015', cost_center: 'MMS CyberJaya', gl_code: '4165', description: '1-day Training course', currency:'$', amt: 299, gst: 2,  exch_rate: 4.31 }
   ]
 })
 
@@ -154,22 +155,44 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap'])
   
 }])
 
+.factory("expenseClaimsList", ["$firebaseArray",'FIREBASE_URL',
+  function($firebaseArray,FIREBASE_URL) {
+    // create a reference to the database where we will store our data
+    var ref = new Firebase(FIREBASE_URL+'expenseclaims');
+
+    return $firebaseArray(ref);
+  }
+])
+
 
 // Main application controller for Expense Claim
-.controller('ExpenseClaimCtrl', ['$scope', '$http', 'DEFAULT_EXPENSE_CLAIM', 'DEFAULT_LOGO', 'LocalStorage', 'Currency','GLCode',
-  function($scope, $http, DEFAULT_EXPENSE_CLAIM, DEFAULT_LOGO, LocalStorage, Currency, GLCode) {
+.controller('ExpenseClaimCtrl', ['$scope', '$http', 'DEFAULT_EXPENSE_CLAIM', 'DEFAULT_LOGO', 'FIREBASE_URL','LocalStorage', 'Currency','GLCode','$firebaseArray', '$firebaseObject','expenseClaimsList',
+  function($scope, $http, DEFAULT_EXPENSE_CLAIM, DEFAULT_LOGO, FIREBASE_URL, LocalStorage, Currency, GLCode, $firebaseArray, $firebaseObject, expenseClaimsList) {
 
   // Set defaults
   $scope.currencySymbol = '$';
   $scope.logoRemoved = false;
   $scope.printMode   = false;
+  $scope.expenseClaimsList = expenseClaimsList;
+
+  var ref = new Firebase(FIREBASE_URL+'expenseclaims');
+  //var syncObject = $firebaseObject(ref);
+  //syncObject.$bindTo($scope, "expenseClaim");
+  $scope.expenseClaims = $firebaseArray(ref);
+  $scope.latestExpenseClaim="";
+
+ref.on("child_added", function(snapshot, prevChildKey) {
+  $scope.latestExpenseClaimID = snapshot.key();
+  $scope.latestExpenseClaim = snapshot.val();
+});
+
 
   (function init() {
     // Attempt to load expense claim from local storage
-    !function() {
+    !function() {      
       var expenseClaim = LocalStorage.getExpenseClaim();
       $scope.expenseClaim = expenseClaim ? expenseClaim : DEFAULT_EXPENSE_CLAIM;
-      $scope.todayDate = moment("1995-12-25");
+      $scope.latestExpenseClaim.expense_claim_number
     }();
 
     // Set logo to the one from local storage or use default
@@ -213,6 +236,7 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap'])
     return total;
   };
 
+
   // Calculates the tax of the specific claim
   $scope.calculateTax = function() {
     return (($scope.expenseClaim.tax * $scope.expenseClaimSubTotal())/100);
@@ -234,8 +258,32 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap'])
   };
 
 $scope.save = function() {     
-  alert(JSON.stringify($scope.expenseClaim));   // you need to save (json obj)?   
+  var expenseClaim = $scope.expenseClaim;
+
+  $scope.expenseClaims.$add({
+    expense_claim_number: expenseClaim.expense_claim_number,
+    employee_info: expenseClaim.employee_info,
+    bank_info: expenseClaim.bank_info,
+    claims: expenseClaim.claims,
+    timestamp: Firebase.ServerValue.TIMESTAMP
+  }).then(function(ref) {
+  var id = ref.key();
+});
  };
+
+ $scope.update = function() {
+    var expenseClaim = $scope.expenseClaims.$getRecord($scope.latestExpenseClaimID);
+    expenseClaim.employee_info = $scope.expenseClaims.employee_info;
+    expenseClaim.bank_info = $scope.expenseClaims.bank_info;
+    expenseClaim.claims = $scope.expenseClaim.claims;
+    expenseClaim.timestamp = Firebase.ServerValue.TIMESTAMP; 
+    $scope.expenseClaims.$save(expenseClaim);
+ };
+
+$scope.printInfo = function() {
+       window.print();
+   }
+
 
   // Disable weekend selection
   $scope.disabled = function(date, mode) {
