@@ -10,9 +10,10 @@ Use this project here: [Angular Expense Claim](http://78.47.210.124:7000)
 ## Roadmap
 
 ~~* Add Firebase integration~~
-* Additional validations for fields
+
 ~~* Realign fields in row for better look~~
 
+* Additional validations for fields
 
 ## License
 
