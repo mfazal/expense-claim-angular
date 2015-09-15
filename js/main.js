@@ -227,15 +227,6 @@ ref.on("child_added", function(snapshot, prevChildKey) {
     $scope.expenseClaim.claims.splice($scope.expenseClaim.claims.indexOf(claim), 1);
   };
 
-  // Calculates the sub total of the expense claim
-  $scope.expenseClaimSubTotal = function() {
-    var total = 0.00;
-    angular.forEach($scope.expenseClaim.claims, function(claim, key){
-      total += (claim.exch_rate * claim.amt);
-    });
-    return total;
-  };
-
 
   // Calculates the tax of the specific claim
   $scope.calculateTax = function() {
@@ -244,8 +235,11 @@ ref.on("child_added", function(snapshot, prevChildKey) {
 
   // Calculates the grand total of the expense claim
   $scope.calculateGrandTotal = function() {
-    saveExpenseClaim();
-    return $scope.calculateTax() + $scope.expenseClaimSubTotal();
+    var total = 0.00;
+    angular.forEach($scope.expenseClaim.claims, function(claim, key){
+      total += (claim.amt * claim.exch_rate)*(1+(claim.gst/100));
+    });
+    return total;
   };
 
   // Clears the local storage
@@ -268,16 +262,20 @@ $scope.save = function() {
     timestamp: Firebase.ServerValue.TIMESTAMP
   }).then(function(ref) {
   var id = ref.key();
+  alert("Saved Successfully");
 });
  };
 
  $scope.update = function() {
     var expenseClaim = $scope.expenseClaims.$getRecord($scope.latestExpenseClaimID);
-    expenseClaim.employee_info = $scope.expenseClaims.employee_info;
-    expenseClaim.bank_info = $scope.expenseClaims.bank_info;
+    expenseClaim.employee_info = $scope.expenseClaim.employee_info;
+    expenseClaim.bank_info = $scope.expenseClaim.bank_info;
     expenseClaim.claims = $scope.expenseClaim.claims;
     expenseClaim.timestamp = Firebase.ServerValue.TIMESTAMP; 
-    $scope.expenseClaims.$save(expenseClaim);
+    $scope.expenseClaims.$save(expenseClaim).then(function(ref) {
+  
+  alert("Updated Successfully");
+});
  };
 
 $scope.printInfo = function() {

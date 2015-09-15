@@ -73,6 +73,9 @@ input:focus {
 .infos .input-container {
   padding:3px 0;
 }
+.infos {
+  border-bottom:1px solid #ddd;
+}
 
 .header.row {
   font-weight:bold;
