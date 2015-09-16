@@ -64,6 +64,7 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap','firebase'])
   };
 
 
+
   Service.setExpenseClaim = function(expenseClaim) {
     localStorage['expense_claim'] = JSON.stringify(expenseClaim);
   };
@@ -220,6 +221,10 @@ ref.on("child_added", function(snapshot, prevChildKey) {
   $scope.editLogo = function() {
     // angular.element('#imgInp').trigger('click');
     document.getElementById('imgInp').click();
+  };
+
+  $scope.loadExpenseClaim = function(index){
+    $scope.expenseClaim = expenseClaimsList[index];
   };
 
   // Removes an claim from the expense claim
