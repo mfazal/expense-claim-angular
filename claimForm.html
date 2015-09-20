@@ -1,0 +1,133 @@
+<div class="modal fade">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" ng-click="close()" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">{{title}}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="tab-content">
+                <form name="claimForm" accept-charset="UTF-8" class="require-validation">
+                  <div class='form-row'>
+                    <div class='form-group required'>
+                      <div class='error form-group hide'>
+                        <div class='alert-danger alert'>
+                          Please correct the errors and try again.
+                        </div>
+                      </div>
+                      <label class='control-label'>Date of Transaction</label>
+                      <p class="input-group">
+                        <input type="text" class="form-control col-xs-3" datepicker-popup="{{dateFormat}}" ng-model="trx_date" is-open="status.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                        <span class="input-group-btn">
+                          <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <div class='form-row'>
+                    <div class='form-group required'>
+                      <div class='error form-group hide'>
+                        <div class='alert-danger alert'>
+                          Please correct the errors and try again.
+                        </div>
+                      </div>
+                      <label class='control-label'>Cost Center</label>
+                      <input class='form-control' size='4' type='text' ng-model="cost_center" ng-required="true" />
+                      <span ng-show="claimForm.size.$error.required">The value is required!</span>
+                    </div>
+                  </div>
+                  <div class='form-row'>
+                    <div class='form-group required'>
+                      <div class='error form-group hide'>
+                        <div class='alert-danger alert'>
+                          Please correct the errors and try again.
+                        </div>
+                      </div>
+                      <label class='control-label'>GL Code</label>
+                    <select class="form-control" ng-model='gl_code' ng-options='glcode.code as glcode.desc for glcode in availbleGLCodes'></select>
+                  </div>
+                </div>
+                <div class='form-row'>
+                  <div class='form-group required'>
+                    <div class='error form-group hide'>
+                      <div class='alert-danger alert'>
+                        Please correct the errors and try again.
+                      </div>
+                    </div>
+                    <label class='control-label'>Description</label>
+                    <input class='form-control' size='4' type='text' ng-model="description" />
+                  </div>
+                </div>
+                <div class='form-row'>
+                  <div class='form-group required'>
+                    <div class='error form-group hide'>
+                      <div class='alert-danger alert'>
+                        Please correct the errors and try again.
+                      </div>
+                    </div>
+                    <label class='control-label'>Currency</label>
+                  <select class="form-control" ng-model='currency' ng-options='currency.symbol as currency.name for currency in availableCurrencies'></select>
+                </div>
+              </div>
+              <div class='form-row'>
+                <div class='form-group required'>
+                  <div class='error form-group hide'>
+                    <div class='alert-danger alert'>
+                      Please correct the errors and try again.
+                    </div>
+                  </div>
+                  <label class='control-label'>Amount</label>
+                  <input class="form-control" type="number" ng-model="amt" value="0.00" ng-required ng-validate="number" size="6" />
+                </div>
+              </div>
+              <div class='form-row'>
+                <div class='form-group required'>
+                  <div class='error form-group hide'>
+                    <div class='alert-danger alert'>
+                      Please correct the errors and try again.
+                    </div>
+                  </div>
+                  <label class='control-label'>GST</label>
+                  <input class="form-control" type="number" ng-model="gst" value="0.00" ng-required ng-validate="number" size="6" />
+                </div>
+              </div>
+              <div class='form-row'>
+                <div class='form-group required'>
+                  <div class='error form-group hide'>
+                    <div class='alert-danger alert'>
+                      Please correct the errors and try again.
+                    </div>
+                  </div>
+                  <label class='control-label'>Exchange Rate</label>
+                  <input class="form-control" type="number" ng-model="exch_rate" value="0.00" ng-required ng-validate="number" size="6" />
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-sm-5">
+          <label class='control-label'></label><!-- spacing -->
+          <div class="alert alert-info">
+            <u><b>Please Note</b></u><br/>
+            Expense claims forms must be approved and signed by the appropriate level of authority before submitting to Account Payable Team<br/>
+            Submitted expense claim form plus ALL supporting bills / receipts must be received by Account Payable Team by COB Tuesday for Friday payment run<br/>
+            Should you have any queries please contact email <a ng-href="mailto:gekyen.lim@randstad.com.sg">gekyen.lim@randstad.com.sg</a><br/>
+            Please choose your method of payment and hit continue. You will then be sent down to pay using your selected payment option.
+          </div>
+          <div class="form-group text-right input-container">
+            <label >Total: {{(amt * exch_rate)*(1+(gst/100)) | currency: "MYR "}}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" ng-click="close()" class="btn btn-primary" data-dismiss="modal">OK</button>
+    <button type="button" ng-click="cancel()" class="btn">Cancel</button>
+  </div>
+</div>
+</div>
+</div>

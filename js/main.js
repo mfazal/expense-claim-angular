@@ -1,4 +1,4 @@
-angular.module('expenseclaiming', ['angularMoment','ui.bootstrap','firebase'])
+angular.module('expenseclaiming', ['angularMoment','ui.bootstrap','firebase', 'angularModalService'])
 
 // The default logo for the expense claim
 .constant('DEFAULT_LOGO', 'images/randstad_logo.png')
@@ -167,8 +167,8 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap','firebase'])
 
 
 // Main application controller for Expense Claim
-.controller('ExpenseClaimCtrl', ['$scope', '$http', 'DEFAULT_EXPENSE_CLAIM', 'DEFAULT_LOGO', 'FIREBASE_URL','LocalStorage', 'Currency','GLCode','$firebaseArray', '$firebaseObject','expenseClaimsList',
-  function($scope, $http, DEFAULT_EXPENSE_CLAIM, DEFAULT_LOGO, FIREBASE_URL, LocalStorage, Currency, GLCode, $firebaseArray, $firebaseObject, expenseClaimsList) {
+.controller('ExpenseClaimCtrl', ['$scope', '$http', 'DEFAULT_EXPENSE_CLAIM', 'DEFAULT_LOGO', 'FIREBASE_URL','LocalStorage', 'Currency','GLCode','$firebaseArray', '$firebaseObject','expenseClaimsList','ModalService',
+  function($scope, $http, DEFAULT_EXPENSE_CLAIM, DEFAULT_LOGO, FIREBASE_URL, LocalStorage, Currency, GLCode, $firebaseArray, $firebaseObject, expenseClaimsList,ModalService) {
 
   // Set defaults
   $scope.currencySymbol = '$';
@@ -232,6 +232,10 @@ ref.on("child_added", function(snapshot, prevChildKey) {
     $scope.expenseClaim.claims.splice($scope.expenseClaim.claims.indexOf(claim), 1);
   };
 
+  $scope.editClaim = function(claim){
+
+  }
+
 
   // Calculates the tax of the specific claim
   $scope.calculateTax = function() {
@@ -256,20 +260,20 @@ ref.on("child_added", function(snapshot, prevChildKey) {
     }
   };
 
-$scope.save = function() {     
-  var expenseClaim = $scope.expenseClaim;
+// $scope.save = function() {     
+//   var expenseClaim = $scope.expenseClaim;
 
-  $scope.expenseClaims.$add({
-    expense_claim_number: expenseClaim.expense_claim_number,
-    employee_info: expenseClaim.employee_info,
-    bank_info: expenseClaim.bank_info,
-    claims: expenseClaim.claims,
-    timestamp: Firebase.ServerValue.TIMESTAMP
-  }).then(function(ref) {
-  var id = ref.key();
-  alert("Saved Successfully");
-});
- };
+//   $scope.expenseClaims.$add({
+//     expense_claim_number: expenseClaim.expense_claim_number,
+//     employee_info: expenseClaim.employee_info,
+//     bank_info: expenseClaim.bank_info,
+//     claims: expenseClaim.claims,
+//     timestamp: Firebase.ServerValue.TIMESTAMP
+//   }).then(function(ref) {
+//   var id = ref.key();
+//   alert("Saved Successfully");
+// });
+//  };
 
  $scope.update = function() {
     var expenseClaim = $scope.expenseClaims.$getRecord($scope.latestExpenseClaimID);
@@ -287,6 +291,82 @@ $scope.printInfo = function() {
        window.print();
    }
 
+  $scope.showClaimForm = function() {
+
+    ModalService.showModal({
+      templateUrl: "claimForm.html",
+      controller: "ClaimController",
+      inputs: {
+        title: "Add New Claim",
+        availableCurrencies: $scope.availableCurrencies,
+        availbleGLCodes: $scope.availbleGLCodes,
+        dateFormat: $scope.format        
+      }
+    }).then(function(modal) {
+      modal.element.modal({ 
+          backdrop: 'static', 
+          keyboard: false 
+      });
+      modal.close.then(function(result) {
+        if(result!=null){
+        // $scope.complexResult  = "Name: " + result.name + ", age: " + result.age;
+        console.log(result.description);
+        $scope.expenseClaim.claims.push({ 
+                                          trx_date: result.trx_date, 
+                                          cost_center: result.cost_center, 
+                                          gl_code: result.gl_code, 
+                                          description: result.description, 
+                                          currency:result.currency, 
+                                          amt: result.amt, 
+                                          gst: result.gst,  
+                                          exch_rate: result.exch_rate 
+                                        });
+        console.log($scope.expenseClaim.claims);          
+        }
+
+      });
+    });
+
+  };
+
+    $scope.showEditClaimForm = function(claim) {
+
+    ModalService.showModal({
+      templateUrl: "claimForm.html",
+      controller: "ClaimController",
+      inputs: {
+        title: "Edit Claim",
+        availableCurrencies: $scope.availableCurrencies,
+        availbleGLCodes: $scope.availbleGLCodes,
+        dateFormat: $scope.format,
+        claimObj: claim
+      }
+    }).then(function(modal) {
+      modal.element.modal({ 
+          backdrop: 'static', 
+          keyboard: false 
+      });
+      modal.close.then(function(result) {
+        if(result!=null){
+        // $scope.complexResult  = "Name: " + result.name + ", age: " + result.age;
+        console.log(result.description);
+        $scope.expenseClaim.claims.push({ 
+                                          trx_date: result.trx_date, 
+                                          cost_center: result.cost_center, 
+                                          gl_code: result.gl_code, 
+                                          description: result.description, 
+                                          currency:result.currency, 
+                                          amt: result.amt, 
+                                          gst: result.gst,  
+                                          exch_rate: result.exch_rate 
+                                        });
+        console.log($scope.expenseClaim.claims);          
+        }
+
+      });
+    });
+
+  };
 
   // Disable weekend selection
   $scope.disabled = function(date, mode) {

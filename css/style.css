@@ -120,10 +120,6 @@ body{
   width: 300px;
 }
 
-div.container{
-  width: 1200px;
-}
-
 #imgInp{
   display: none;
 }
@@ -144,4 +140,32 @@ div.container{
   display: inline-block;
   position: relative;
   color: #ce0c15;
+}
+
+
+body{
+  background: #F7F5FA;
+  overflow-x: hidden;
+}
+.container-full {
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 15px;
+}
+#sidebar{
+  float: left;
+  width: 20%;
+  position: relative;
+  background: #ddd;
+  display: block
+}
+#sidebar #expenseClaimList{
+  padding: 10px;
+}
+#main-content{
+  background: #FFF;
+  position: relative;
+  min-height: 600px;
+  width: 80%;
+    float:left;
 }
