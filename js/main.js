@@ -24,6 +24,12 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap','firebase', 'a
   ]
 })
 
+.filter('fromNow', function() {
+    return function(dateString) {
+      return moment(dateString).fromNow()
+    };
+  })
+
 // Service for accessing local storage
 .service('LocalStorage', [function() {
 
@@ -233,7 +239,7 @@ ref.on("child_added", function(snapshot, prevChildKey) {
   };
 
   $scope.editClaim = function(claim){
-
+    $scope.showEditClaimForm(claim, $scope.expenseClaim.claims.indexOf(claim));
   }
 
 
@@ -260,20 +266,21 @@ ref.on("child_added", function(snapshot, prevChildKey) {
     }
   };
 
-// $scope.save = function() {     
-//   var expenseClaim = $scope.expenseClaim;
+$scope.save = function() {     
+  var expenseClaim = $scope.expenseClaim;
+  console.log("expenseClaim:: "+expenseClaim);
 
-//   $scope.expenseClaims.$add({
-//     expense_claim_number: expenseClaim.expense_claim_number,
-//     employee_info: expenseClaim.employee_info,
-//     bank_info: expenseClaim.bank_info,
-//     claims: expenseClaim.claims,
-//     timestamp: Firebase.ServerValue.TIMESTAMP
-//   }).then(function(ref) {
-//   var id = ref.key();
-//   alert("Saved Successfully");
-// });
-//  };
+  $scope.expenseClaims.$add({
+    expense_claim_number: expenseClaim.expense_claim_number,
+    employee_info: expenseClaim.employee_info,
+    bank_info: expenseClaim.bank_info,
+    claims: expenseClaim.claims,
+    timestamp: Firebase.ServerValue.TIMESTAMP
+  }).then(function(ref) {
+  var id = ref.key();
+  alert("Saved Successfully");
+});
+ };
 
  $scope.update = function() {
     var expenseClaim = $scope.expenseClaims.$getRecord($scope.latestExpenseClaimID);
@@ -300,7 +307,8 @@ $scope.printInfo = function() {
         title: "Add New Claim",
         availableCurrencies: $scope.availableCurrencies,
         availbleGLCodes: $scope.availbleGLCodes,
-        dateFormat: $scope.format        
+        dateFormat: $scope.format,
+        claimObj: null                
       }
     }).then(function(modal) {
       modal.element.modal({ 
@@ -309,7 +317,7 @@ $scope.printInfo = function() {
       });
       modal.close.then(function(result) {
         if(result!=null){
-        // $scope.complexResult  = "Name: " + result.name + ", age: " + result.age;
+          if(result.trx_date!=null && result.cost_center!="" && result.cost_center!=""){
         console.log(result.description);
         $scope.expenseClaim.claims.push({ 
                                           trx_date: result.trx_date, 
@@ -324,13 +332,14 @@ $scope.printInfo = function() {
         console.log($scope.expenseClaim.claims);          
         }
 
+          }
+
       });
     });
 
   };
 
-    $scope.showEditClaimForm = function(claim) {
-
+    $scope.showEditClaimForm = function(claim,index) {
     ModalService.showModal({
       templateUrl: "claimForm.html",
       controller: "ClaimController",
@@ -348,18 +357,8 @@ $scope.printInfo = function() {
       });
       modal.close.then(function(result) {
         if(result!=null){
-        // $scope.complexResult  = "Name: " + result.name + ", age: " + result.age;
         console.log(result.description);
-        $scope.expenseClaim.claims.push({ 
-                                          trx_date: result.trx_date, 
-                                          cost_center: result.cost_center, 
-                                          gl_code: result.gl_code, 
-                                          description: result.description, 
-                                          currency:result.currency, 
-                                          amt: result.amt, 
-                                          gst: result.gst,  
-                                          exch_rate: result.exch_rate 
-                                        });
+        $scope.expenseClaim.claims[index]=result;
         console.log($scope.expenseClaim.claims);          
         }
 

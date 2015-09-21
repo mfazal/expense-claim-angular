@@ -8,7 +8,6 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link href="css/simple-sidebar.css" rel="stylesheet">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.min.js"></script>
@@ -39,14 +38,19 @@
     <aside id="sidebar">
       <h1 class="">Claims List</h1>
         <div id="expenseClaimList">
+          <ul>
             <li ng-repeat="expenseClaim in expenseClaimsList">
-              <a href ng-click="loadExpenseClaim($index)">{{ expenseClaim.expense_claim_number }}: {{ expenseClaim.timestamp }}</a>
-              <!-- <a href ng-click="expenseClaimsList.$remove(expenseClaim)" class="btn btn-danger">[X]</a> -->
-              <button type="button" ng-click="expenseClaimsList.$remove(expenseClaim)" class="btn btn-sm btn-danger">
-                  <i class="glyphicon glyphicon-remove-circle">
-                  </i>
-              </button>              
+              <div class="col-xs-9">
+                <a href ng-click="loadExpenseClaim($index)">{{ expenseClaim.expense_claim_number }}: {{ expenseClaim.timestamp | fromNow }}</a>
+              </div>
+              <div class="col-xs-3">
+                <button type="button" ng-click="expenseClaimsList.$remove(expenseClaim)" class="btn btn-sm btn-danger ">
+                    <i class="glyphicon glyphicon-remove-circle">
+                    </i>
+                </button>                              
+              </div>
             </li>
+          </ul>
           </div>
       <hr class="">
     </aside>

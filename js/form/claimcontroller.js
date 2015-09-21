@@ -1,24 +1,37 @@
 var app = angular.module('expenseclaiming');
 
 app.controller('ClaimController', [
-  '$scope', '$element', 'title', 'close', 'availableCurrencies','availbleGLCodes','dateFormat',
-  function($scope, $element, title, close,availableCurrencies,availbleGLCodes,dateFormat) {
+  '$scope', '$element', 'title', 'close', 'availableCurrencies','availbleGLCodes','dateFormat','claimObj',
+  function($scope, $element, title, close,availableCurrencies,availbleGLCodes,dateFormat,claimObj) {
 
   // $scope.name = null;
   // $scope.age = null;
   $scope.title = title;
   $scope.availableCurrencies = availableCurrencies;
+
   $scope.availbleGLCodes =availbleGLCodes;
   $scope.dateFormat = dateFormat;
   //{ trx_date: '01/08/2015', cost_center: "", gl_code: "", description: "", currency:"", amt: 0, gst: 0,  exch_rate: 0 }
-  $scope.trx_date = null;
-  $scope.cost_center="";
-  $scope.gl_code="";
-  $scope.description="";
-  $scope.currency="";
-  $scope.amt=0.0;
-  $scope.gst=0;
-  $scope.exch_rate=0.0;
+  if(claimObj == null){
+    $scope.trx_date = null;
+    $scope.cost_center="";
+    $scope.gl_code="";
+    $scope.description="";
+    $scope.currency="";
+    $scope.amt=0.0;
+    $scope.gst=0;
+    $scope.exch_rate=0.0;    
+  } else {
+      $scope.trx_date = claimObj.trx_date;
+  $scope.cost_center=claimObj.cost_center;
+  $scope.gl_code=claimObj.gl_code;
+  $scope.description=claimObj.description;
+  $scope.currency=claimObj.currency;
+  $scope.amt=claimObj.amt;
+  $scope.gst=claimObj.gst;
+  $scope.exch_rate=claimObj.exch_rate;
+  }
+
 
   // Disable weekend selection
   $scope.disabled = function(date, mode) {
@@ -63,12 +76,12 @@ app.controller('ClaimController', [
         status: 'partially'
       }
     ];
-      
+
   //  This close function doesn't need to use jQuery or bootstrap, because
   //  the button has the 'data-dismiss' attribute.
   $scope.close = function() {
     close({
-      trx_date: $scope.trx_date,
+      trx_date: $scope.trx_date.getTime(),
       cost_center: $scope.cost_center,
       gl_code: $scope.gl_code,
       description: $scope.description,
