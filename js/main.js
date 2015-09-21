@@ -8,11 +8,10 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap','firebase', 'a
 // The expense claim displayed when the user first uses the app
 .constant('DEFAULT_EXPENSE_CLAIM', {
   tax: 13.00,
-  expense_claim_number: 1,
   employee_info: {
     name: 'Mr. John Doe',
     branch_code: 'XYZ-123',
-    claim_date: '2015-08-31'
+    claim_date: '1435694400000'
   },
   bank_info: {
     bank_code: 'BANK-00123',
@@ -20,7 +19,7 @@ angular.module('expenseclaiming', ['angularMoment','ui.bootstrap','firebase', 'a
     acct_name: 'JOHN DOE JR.'
   },  
   claims:[
-    { trx_date: '01/08/2015', cost_center: 'MMS CyberJaya', gl_code: '4165', description: '1-day Training course', currency:'$', amt: 299, gst: 2,  exch_rate: 4.31 }
+    { trx_date: '1435694400000', cost_center: 'MMS CyberJaya', gl_code: '4165', description: '1-day Training course', currency:'$', amt: 299, gst: 2,  exch_rate: 4.31 }
   ]
 })
 
@@ -212,10 +211,30 @@ ref.on("child_added", function(snapshot, prevChildKey) {
     $scope.availbleGLCodes = GLCode.all();
 
   })()
-  // Adds an item to the claim's items
-  $scope.addClaim = function() {
-    $scope.expenseClaim.claims.push({ trx_date: '01/08/2015', cost_center: "", gl_code: "", description: "", currency:"", amt: 0, gst: 0,  exch_rate: 0 });
+
+  $scope.isUpdate = function() {
+    console.log("expense_claim_number:: "+$scope.expenseClaim.expense_claim_number);
+    if ($scope.expenseClaim.expense_claim_number!= null)
+      return true;
+    else
+      return false;
   }
+
+  $scope.isNew = function() {
+    if ($scope.expenseClaim.expense_claim_number== null || $scope.expenseClaim.expense_claim_number.length==0)
+      return true;
+    else
+      return false;
+  }  
+
+  $scope.newExpenseClaim = function() {
+    $scope.expenseClaim = DEFAULT_EXPENSE_CLAIM;
+  }
+
+  // // Adds an item to the claim's items
+  // $scope.addClaim = function() {
+  //   $scope.expenseClaim.claims.push({ trx_date: '01/08/2015', cost_center: "", gl_code: "", description: "", currency:"", amt: 0, gst: 0,  exch_rate: 0 });
+  // }
 
   // Toggle's the logo
   $scope.toggleLogo = function(element) {
