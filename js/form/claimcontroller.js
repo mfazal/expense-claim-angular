@@ -32,16 +32,28 @@ app.controller('ClaimController', [
   $scope.exch_rate=claimObj.exch_rate;
   }
 
+  //Set today's date
+  $scope.today = function() {
+    $scope.dt = new Date();
+  };
+  $scope.today();
+
+  $scope.clear = function () {
+    $scope.dt = null;
+  };
 
   // Disable weekend selection
   $scope.disabled = function(date, mode) {
     return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
   };
+  var date = new Date();
 
   $scope.toggleMin = function() {
-    $scope.minDate = $scope.minDate ? null : new Date();
+    var date = new Date();
+    $scope.minDate = date.setDate((new Date()).getDate() - 90);
   };
   $scope.toggleMin();
+  
   $scope.maxDate = new Date(2020, 5, 22);
 
   $scope.open = function($event) {

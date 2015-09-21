@@ -213,7 +213,6 @@ ref.on("child_added", function(snapshot, prevChildKey) {
   })()
 
   $scope.isUpdate = function() {
-    console.log("expense_claim_number:: "+$scope.expenseClaim.expense_claim_number);
     if ($scope.expenseClaim.expense_claim_number!= null)
       return true;
     else

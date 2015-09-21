@@ -20,7 +20,7 @@
                       </div>
                       <label class='control-label'>Date of Transaction</label>
                       <p class="input-group">
-                        <input type="text" class="form-control col-xs-3" datepicker-popup="{{dateFormat}}" ng-model="trx_date" is-open="status.opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                        <input type="text" class="form-control col-xs-3" datepicker-popup="{{dateFormat}}" min-date="minDate" max-date="dt" ng-model="trx_date" is-open="status.opened" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
                         <span class="input-group-btn">
                           <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                         </span>
