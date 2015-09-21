@@ -269,6 +269,18 @@ ref.on("child_added", function(snapshot, prevChildKey) {
 $scope.save = function() {     
   var expenseClaim = $scope.expenseClaim;
   console.log("expenseClaim:: "+expenseClaim);
+var expenseClaimSeq = new Firebase(FIREBASE_URL+'expense_claim_seq');
+  console.log("expense_claim_seq:: "+expenseClaimSeq);
+
+expenseClaimSeq.transaction(function (current_val) {
+  return (current_val || 0) + 1;
+});
+expenseClaimSeq.on("value", function(snapshot) {
+  console.log(snapshot.val());
+  $scope.expenseClaim.expense_claim_number = snapshot.val();
+}, function (errorObject) {
+  console.log("The read failed: " + errorObject.code);
+});
 
   $scope.expenseClaims.$add({
     expense_claim_number: expenseClaim.expense_claim_number,
